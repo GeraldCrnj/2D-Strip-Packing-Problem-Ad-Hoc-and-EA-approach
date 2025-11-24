@@ -1,0 +1,29 @@
+# --- Variables de Configuración ---
+CXX = g++
+CXXFLAGS = -O3 -std=c++17 -Wall
+TARGET = implementacion
+SRC = implementacion.cpp
+
+# --- Reglas ---
+
+# Regla por defecto (al escribir solo 'make')
+all: $(TARGET)
+
+# Regla para compilar el ejecutable
+$(TARGET): $(SRC)
+	@echo "Compilando $(SRC)..."
+	$(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET)
+	@echo "Compilacion exitosa. Ejecutable: ./$(TARGET)"
+
+# Regla para ejecutar el programa
+run: $(TARGET)
+	@echo "Ejecutando ./$(TARGET)..."
+	./$(TARGET)
+
+# Regla para limpiar archivos generados
+clean:
+	@echo "Limpiando..."
+	rm -f $(TARGET)
+	@echo "Limpieza completada."
+
+.PHONY: all run clean

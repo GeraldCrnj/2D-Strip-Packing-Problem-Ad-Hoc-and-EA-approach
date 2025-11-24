@@ -1,0 +1,273 @@
+\documentclass[letter, 10pt]{article}
+\usepackage[utf8]{inputenc}     % Permite usar caracteres UTF-8 (como tildes directamente)
+\usepackage{tabularx}   % Para ancho automático de columnas
+\usepackage{booktabs}   % Para mejores líneas horizontales
+\usepackage[spanish]{babel}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage[dvips]{graphicx}
+\usepackage{url}
+\usepackage[top=3cm,bottom=3cm,left=3.5cm,right=3.5cm,footskip=1.5cm,headheight=1.5cm,headsep=.5cm,textheight=3cm]{geometry}
+
+
+\begin{document}
+\title{Inteligencia Artificial \\ \begin{Large}Estado del Arte: Problema  2D Space Packing Problem\end{Large}}
+\author{Geraldine Cornejo}
+\date{\today}
+\maketitle
+
+
+%--------------------No borrar esta secci\'on--------------------------------%
+\section*{Evaluaci\'on}
+
+\begin{tabular}{ll}
+Resumen (5\%): & \underline{\hspace{2cm}} \\
+Introducci\'on (5\%):  & \underline{\hspace{2cm}} \\
+Definici\'on del Problema (10\%):  & \underline{\hspace{2cm}} \\
+Estado del Arte (35\%):  & \underline{\hspace{2cm}} \\
+Modelo Matem\'atico (20\%): &  \underline{\hspace{2cm}}\\
+Conclusiones (20\%): &  \underline{\hspace{2cm}}\\
+Bibliograf\'ia (5\%): & \underline{\hspace{2cm}}\\
+ &  \\
+\textbf{Nota Final (100\%)}:   & \underline{\hspace{2cm}}
+\end{tabular}
+%---------------------------------------------------------------------------%
+\vspace{2cm}
+
+
+\begin{abstract}
+El presente informe analiza el \textbf{Two-Dimensional Strip Packing Problem (2DSPP)}, un problema clásico de corte y empaquetamiento que busca organizar un conjunto de rectángulos dentro de una banda de ancho fijo y altura ilimitada, minimizando la altura total ocupada. Debido a su naturaleza combinatoria y a ser un problema NP-difícil, se han desarrollado múltiples enfoques exactos, heurísticos y metaheurísticos. El documento revisa el estado del arte, presentando los principales métodos y tendencias actuales, entre ellas los enfoques híbridos y basados en aprendizaje automático. Además, se incluyen dos formulaciones matemáticas —una continua y otra discreta— que modelan rigurosamente el problema. Finalmente, se exponen las conclusiones y proyecciones futuras, destacando la relevancia del 2DSPP en contextos industriales y de optimización.
+\end{abstract}
+
+
+\section{Introducci\'on}
+
+El problema de empaquetamiento en banda dimensional se refiere a la organizaci\'on de un grupo de rect\'angulos con dimensiones espec\'ificas (anchos y alturas) dentro de una banda con un ancho determinado y una altura ilimitada. El prop\'osito es reducir al m\'inimo la altura de la banda y, simult\'aneamente, el espacio no utilizado en este sector. El 2DSPP es un problema NP-Hard debido a su car\'acter combinatorio. Por este motivo, se desea desarrollar estrategias que empleen heur\'isticas y metaheur\'isticas, ya que estas hacen posible conseguir soluciones de calidad en un tiempo razonable.
+
+El objetivo del documento es mostrar el estado actual del arte en relaci\'on al problema planteado, examinando las metodolog\'ias fundamentales empleadas y evaluando su rendimiento, fundamentos y \'areas de aplicaci\'on. Asimismo, se detectan las restricciones y los beneficios de los enfoques m\'as destacados. El an\'alisis tiene como objetivo ayudar a entender las estrategias utilizadas para resolver el problema y enfatizar la relevancia de este en el \'area de la ingenier\'ia y la investigaci\'on de operaciones.
+
+
+La estructura del presente informe se organiza de la siguiente manera:
+En la \textbf{Sección 2}, se expone una \textit{definición formal del problema}, describiendo sus variables fundamentales, restricciones, relación con otros problemas clásicos de optimización y relevancia industrial.
+En la \textbf{Sección 3}, se desarrolla el \textit{estado del arte}, donde se revisan los principales avances teóricos y metodológicos en la resolución del 2DSPP, abarcando métodos exactos, heurísticos, metaheurísticos e híbridos, además de discutir las tendencias actuales de investigación y los resultados empíricos comparativos.
+La \textbf{Sección 4} presenta los \textit{modelos matemáticos} asociados al problema: una formulación continua basada en coordenadas y una formulación discreta basada en posiciones y cobertura, ambas detalladas con sus variables, restricciones y justificaciones teóricas.
+Finalmente, en la \textbf{Sección 5} se ofrecen las \textit{conclusiones}, donde se sintetizan los hallazgos del estudio, se identifican las limitaciones de los enfoques existentes y se plantean posibles líneas de trabajo futuro orientadas a la aplicación de técnicas de aprendizaje automático y estrategias híbridas adaptativas.
+
+\section{Definici\'on del Problema}
+
+El \textbf{Two-Dimensional Strip Packing Problem (2DSPP)} constituye una de las variantes más estudiadas dentro de la amplia familia de los problemas de corte y empaquetamiento (\textit{cutting and packing problems}). Este problema consiste en organizar un conjunto de rectángulos dentro de una banda o \textit{strip} de ancho fijo y altura ilimitada, de modo que las piezas no se solapen y permanezcan alineadas ortogonalmente. El objetivo fundamental es minimizar la altura total ocupada por el conjunto de rectángulos. En términos más generales, el 2DSPP busca optimizar el uso del espacio disponible, lo que resulta esencial en contextos industriales donde la eficiencia en la utilización de materiales, superficies o recursos de almacenamiento representa un factor determinante en los costos y la productividad \cite{Dyckhoff1990Typology,WascherHaussnerSchumann2007Typology}.
+
+Este problema puede concebirse como una extensión bidimensional del clásico \textit{Bin Packing Problem} (BPP), en el que las piezas deben disponerse dentro de un contenedor con una anchura predefinida y una altura variable. Sin embargo, a diferencia del BPP tradicional —donde se busca minimizar el número de contenedores empleados—, el 2DSPP se enfoca en reducir la altura total utilizada por un único contenedor. Esta característica lo hace especialmente relevante para aplicaciones en la industria del corte de materiales (como madera, metal o textiles), el diseño automatizado, la planificación de producción y la optimización del espacio en sistemas logísticos.
+
+Dado que el problema pertenece a la clase de los \textit{NP-hard}, no existe un algoritmo exacto de complejidad polinómica capaz de garantizar soluciones óptimas en instancias de gran tamaño \cite{MartelloVigo1998Exact}. La dificultad radica en el enorme número de combinaciones posibles para ubicar las piezas dentro de la banda: incluso un pequeño cambio en la posición o la rotación de un solo rectángulo puede alterar significativamente la altura total alcanzada. Por ello, las soluciones exactas suelen ser viables únicamente en instancias pequeñas, mientras que para casos de mayor escala se recurre a métodos aproximados —heurísticas y metaheurísticas— que permiten obtener soluciones de alta calidad en tiempos de cómputo razonables \cite{CidGarciaRios2020Review}.
+
+Las variables decisivas del problema comprenden las dimensiones de cada pieza (ancho y alto específicos), su posición dentro de la banda, la secuencia en que se insertan, la posibilidad o no de rotarlas 90°, y la altura total alcanzada —la cual constituye la variable objetivo a minimizar. Estas variables se complementan con un conjunto de restricciones que aseguran la factibilidad espacial del empaquetamiento, evitando cualquier tipo de superposición entre piezas y garantizando que todas permanezcan dentro de los límites de la banda.
+
+Desde el punto de vista de modelado, el objetivo del 2DSPP se formula habitualmente como la minimización de la altura total utilizada. Alternativamente, puede interpretarse como la maximización de la densidad de ocupación o la minimización del espacio vacío. En escenarios computacionales, esta optimización se extiende además al rendimiento del algoritmo, procurando reducir los tiempos de ejecución y mejorar la calidad promedio de las soluciones aproximadas.
+
+El 2DSPP mantiene una estrecha relación con otros problemas clásicos de optimización. En particular, comparte fundamentos con el \textbf{Two-Dimensional Bin Packing Problem (2DBPP)}, en el cual tanto la altura como el ancho del contenedor están limitados y el propósito es minimizar el número total de contenedores requeridos. Asimismo, guarda una conexión directa con el \textbf{Cutting Stock Problem (CSP)}, que busca dividir materiales de gran tamaño en piezas más pequeñas minimizando el desperdicio \cite{WascherHaussnerSchumann2007Typology}. Otro caso particular es el \textbf{Guillotine Cutting Problem}, donde las soluciones están restringidas a cortes tipo “guillotina”, es decir, cortes rectos que atraviesan completamente la pieza, siendo este un modelo especialmente útil en contextos industriales en los que las máquinas de corte solo permiten operaciones lineales \cite{MartelloVigo1998Exact}.
+
+En síntesis, el 2DSPP representa un equilibrio complejo entre la rigurosidad teórica de los problemas combinatorios y la aplicabilidad práctica en procesos reales. Su estudio ha impulsado el desarrollo de técnicas híbridas y modelos de optimización avanzados, reflejando la continua búsqueda por soluciones que armonicen precisión matemática y eficiencia computacional.
+
+\section{Estado del Arte}
+El análisis de los problemas de corte y empaquetamiento tiene raíces sólidamente establecidas en la literatura de investigación operativa. Una de las primeras clasificaciones sistemáticas fue propuesta por Dyckhoff (1990), quien estableció una tipología unificada que abarcaba problemas unidimensionales, bidimensionales y tridimensionales, definiendo los fundamentos conceptuales para su categorización formal \cite{Dyckhoff1990Typology}. Posteriormente, Wäscher, Haußner y Schumann (2007) perfeccionaron esta clasificación, proponiendo una taxonomía más precisa y coherente que ha servido de referencia en la mayoría de los trabajos contemporáneos sobre empaquetamiento \cite{Wascher2007Typology}.
+
+En este contexto, el Two-Dimensional Strip Packing Problem (2DSPP) se ha consolidado como una de las variantes más estudiadas dentro de la optimización combinatoria, tanto por su complejidad teórica —es un problema NP-difícil— como por su amplia aplicabilidad práctica en industrias como el corte de materiales (vidrio, acero, papel), la planificación de embalajes y la organización de componentes en manufactura \cite{CidGarciaRios2020Review}. Las primeras aproximaciones, inspiradas en el Cutting Stock Problem y el Bin Packing Problem, exploraron formulaciones exactas adecuadas para instancias pequeñas, así como heurísticas constructivas diseñadas para obtener soluciones de buena calidad en problemas de mayor escala \cite{MartelloVigo1998Exact}. Estas aproximaciones sentaron las bases metodológicas para abordar el objetivo principal del 2DSPP: minimizar la altura total de la banda sin superponer rectángulos.
+
+El desarrollo histórico de técnicas de resolución se puede dividir en tres grandes familias.
+Primero, los métodos exactos, como los modelos de programación entera mixta y los algoritmos de ramificación y acotamiento, que garantizan soluciones óptimas pero solo resultan viables para instancias de tamaño pequeño o medio \cite{CidGarciaRios2020Review}.
+Segundo, las heurísticas constructivas, basadas en reglas codiciosas como Bottom-Left, Best-Fit y First-Fit-Decreasing, así como en estructuras skyline o de perfiles, que permiten generar soluciones rápidas a costa de sacrificar la garantía de optimalidad \cite{Oliveira2016Survey}.
+Finalmente, las metaheurísticas, que incluyen algoritmos genéticos, búsqueda tabú, recocido simulado y búsqueda de vecindades variables (VNS), introducen mecanismos de diversificación y mejora local que refinan las soluciones obtenidas y amplían la cobertura del espacio de búsqueda \cite{Iori2020Survey}.
+
+En los últimos años, se ha observado una marcada tendencia hacia los métodos híbridos, que combinan estrategias constructivas, exactas y estocásticas para explotar las ventajas de cada enfoque. Estas técnicas mixtas han demostrado ser particularmente eficaces en instancias de gran tamaño, manteniendo un equilibrio favorable entre calidad de la solución y tiempo de cómputo. Paralelamente, los enfoques tipo portafolio (portfolio algorithms) han cobrado relevancia, ya que permiten seleccionar o combinar heurísticas en función de las características de cada instancia, mejorando la robustez ante la variabilidad de los datos.
+
+La representación de las soluciones constituye otro aspecto crucial del 2DSPP, ya que influye directamente en la eficiencia computacional. Las representaciones por niveles o estantes dividen la banda en franjas horizontales donde se ubican los rectángulos según políticas de llenado. Las representaciones por posiciones discretas identifican ubicaciones válidas para cada elemento, permitiendo una exploración sistemática del espacio de soluciones. Los modelos basados en perfiles o skyline conservan la silueta superior del empaquetamiento, insertando nuevos rectángulos en huecos disponibles, mientras que las representaciones guillotina restringen los cortes a divisiones rectas, de gran relevancia en procesos industriales donde los cortes deben ser físicamente realizables \cite{Iori2020Survey, MartelloVigo1998Exact}. De manera general, las representaciones por perfiles y posiciones suelen ofrecer el mejor balance entre simplicidad y eficacia en la búsqueda.
+
+El examen comparativo de la literatura evidencia que no existe un algoritmo universalmente superior. La eficacia depende de factores como la distribución de tamaños de los rectángulos, la posibilidad de rotación y la presencia de restricciones guillotina. En consecuencia, mientras que los enfoques exactos de tipo Positions and Covering resultan más adecuados para aplicaciones que requieren soluciones certificadas, las metaheurísticas basadas en perfiles y estrategias best-fit dominan en entornos industriales que priorizan la eficiencia práctica \cite{Iori2020Survey}.
+
+Las líneas de investigación actuales se orientan principalmente hacia tres direcciones.
+(1) Hibridación y portafolios algorítmicos, que integran múltiples heurísticas y métodos exactos con el fin de potenciar la robustez y escalabilidad.
+(2) Mejoras en modelos exactos, mediante la generación de cortes geométricos, acotaciones más ajustadas y técnicas de enumeración por posiciones, lo que amplía el tamaño de instancias tratables.
+(3) Aplicación del aprendizaje automático, particularmente bajo el paradigma learning-to-heuristic, en el cual los modelos de IA se entrenan para seleccionar o parametrizar heurísticas según las características estructurales de la instancia. Estas estrategias reflejan la tendencia contemporánea a fusionar inteligencia adaptativa con métodos clásicos de optimización, logrando así soluciones de alta calidad en tiempos computacionalmente razonables.
+
+Para ilustrar el rendimiento actual de los métodos del 2DSPP, se presenta la Cuadro 1, basada en experimentos recientes sobre instancias estándar. En ella se comparan diferentes algoritmos/métodos respecto a la calidad de la solución (altura del strip o porcentaje de ocupación) y el tiempo de cómputo en diferentes benchmarks. Estos datos permiten apreciar claramente los trade-offs entre precisión y costo computacional.
+
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.3} % Aumenta la altura de filas
+    \begin{tabularx}{\textwidth}{X X X X X}
+    \toprule
+        \textbf{Instancia/ Benchmark} & \textbf{Ancho de banda (W)} & \textbf{Número de rectángulos (n)} & \textbf{Algoritmo/ Método} & \textbf{Altura obtenida/Calidad (\%)*/Tiempo de cómputo/Comentarios} \\
+        \midrule
+        Hopper \& Turton, conjunto "C" & 100--160 & $\sim$16--197 & Heurística genérica / metaheurística (GPA) & Alta calidad comparada con óptimo conocido (muy cercano). Tiempo moderado, usable para uso práctico. \\
+        \addlinespace
+        Benchmark "N" / "T" de 2DPackLib & $\approx$200 & 35 & Heurísticas comparadas en estudio de clases de instancias & Varía según clase, pero en instancias simples la solución es casi óptima; en otras hay desviaciones de 5--10\%. Tiempo bajo para heurísticas simples; mayor para heurísticas más complejas. \\
+        \addlinespace
+        Portafolio algorítmico CIE (2022) & varios / datasets mixtos & diversa & Portafolio seleccionado vs heurísticas individuales & Mejora en calidad vs heurísticas estándar bajo límite de tiempo. También se evalúa el coste de cómputo del portafolio (overhead) pero compensa en muchas instancias. \\
+    \bottomrule
+    \end{tabularx}
+    \caption{Comparación de algoritmos para el problema de 2D Strip Packing.}
+    \label{tab:benchmark}
+\end{table}
+
+\noindent
+* “Calidad (\%)" puede ser porcentaje de ocupación del strip o porcentaje respecto del óptimo, según la instancia.
+
+
+En particular, se observa que los métodos portafolio muestran mejoras respecto a heurísticas individuales cuando se impone un límite de tiempo, aunque incurriendo en cierta sobrecarga computacional en la selección del portafolio. También se documenta en muchos casos (benchmark “N”, “C”, etc.) que las heurísticas simples o basadas en reglas greedy alcanzan soluciones cerca del óptimo cuando la distribución de rectángulos es favorable, pero su eficiencia disminuye en instancias con alta variabilidad de tamaños o restricciones adicionales.
+
+
+\section{Modelo Matem\'atico}
+    Se presentan dos modelos complementarios: (1) una formulación MIP continua que modela directamente coordenadas y garantiza la no superposición mediante variables binarias por pares; y (2) un modelo discreto de posiciones y cobertura que transforma el problema geométrico en un problema de selección binaria sobre un conjunto finito de posiciones candidatas.
+    \subsection{ Modelo continuo por coordenadas (MIP)}
+        \subsubsection{Parámetros}
+        \begin{itemize}
+            \item $n$        Número de rectángulos (ítems).
+            \item $W$        Ancho fijo de la banda (strip).
+            \item $w_i,h_i$  Ancho y altura del rectángulo $i$, $i=1,...,n.$
+            \item $M$        Constante grande (big-M).
+        \end{itemize}
+
+        \subsubsection{Variables}
+        \begin{itemize}
+            \item $x_i \in [0,W-w_i]$ Coordenada $x$ (posición horizontal) del borde izquierdo del rectángulo $i.$
+            \item $y_i\in[0,H]$ Coordenada y (posición vertical) del borde inferior del rectángulo $i$.
+            \item $H\geq0$ Altura totald el strip (Variable a minimizar).
+            \item $r_i\in{0,1}$ Binaria que indica rotación 90° de $i$ (1=rotado).
+            \item $\alpha_{ij},\beta_{ij},\gamma_{ij}, \delta_{ij}$ (para $i<j$) variables binarias que codifican la relación espacial entre $i$ y $j.$
+        \end{itemize}
+
+        \textbf{Interpretación de las binarias} (para cada par $i<j$): exactamente una de las cuatro relaciones espaciales se cumple:
+        \begin{itemize}
+            \item $\alpha_{ij}=1$: $i$ está estrictamente a la izquierda de $j$ (es decir, $x_i+w_i\leq x_j$).
+            \item $\beta_{ij}=1$: $i$ está estrictamente a la derecha de $j$ (es decir, $x_j+w_j\leq x_i$).
+            \item $\gamma_{ij}=1$: $i$ está estrictamente por debajo de $j$ (es decir, $y_i+h_i\leq y_j$).
+            \item $\delta_{ij}=1$: $i$ está estrictamente por encima de $j$ (es decir, $y_j+h_j\leq y_i$).
+        \end{itemize}
+
+        Estas cuatro relaciones garantizan que no haya solapamiento entre $i$ y $j$.
+
+        \subsubsection{Objetivo}
+        Minimizar la altura total H del strip ocupada por los rectángulos.
+
+        {\centering $min\, H$ \par}
+
+        \subsubsection{Restricciones}
+        \begin{enumerate}
+            \item Dentro de la anchura del strip (límite horizontal):
+            \[
+            x_i \geq 0,\quad x_i + w_i \leq W,\quad \forall i
+            \]
+            Cada rectángulo se coloca dentro de los límites horizontales del strip; su coordenada $x_i$ más su ancho no puede superar W.
+
+            \item Definición de la altura total (H):
+            \[
+            y_i \geq 0,\quad y_i + h_i \leq H,\quad \forall i
+            \]
+            La coordenada vertical inferior de cada rectángulo es no negativa y el borde superior $y_i+h_i$ debe estar por debajo de la altura total H; al minimizar H se fuerza la compresión vertical de la solución.
+            \item Condiciones de no solapamiento por pares — implementadas con big-M:
+            
+            Para cada par $i<j$:
+            \[x_i +w_i \leq x_j +M(1-\alpha_{ij}),\]
+            \[x_j +w_j \leq x_i +M(1-\beta_{ij}),\]
+            \[y_i +h_i \leq y_j +M(1-\gamma_{ij}),\]
+            \[y_j+h_j \leq y_i +M(1-\delta_{ij}),\]
+            \[\alpha_{ij}+\beta_{ij}+\gamma_{ij}+ \delta_{ij}=1.\]
+            para cada par de rectángulos se obliga a elegir exactamente una de las cuatro relaciones espaciales (izquierda, derecha, debajo, encima). Las desigualdades con M son activadas/desactivadas por las binarias; si $\alpha_{ij}=1$ se fuerza $x_i+w_i \leq x_j$, de lo contrario la desigualdad queda relajada por el término $M(1-\alpha_{ij})$.
+            \item Rotación:
+            \[w´_i = w_i(1-r_i) + h_ir_i\]
+            \[h´_i = h_i(1-r_i) + w_ir_i\]
+            y en las restricciones sustituir $w_i$ por $w'_i, h_i$ por $h'_i.$
+            
+            La rotación intercambia ancho y alto cuando $r_i =1.$
+            \item Dominio de variables:
+            \[x_iy_i \,reales,\, H\geq0,\,\alpha_{ij},\beta_{ij},\gamma_{ij}, \delta_{ij}\in{0,1}\]
+        \end{enumerate}
+        \subsubsection{Espacio de búsqueda}
+            El espacio de búsqueda es continuo/mixto: $(x_i,y_i)$ viven en un dominio continuo sujeto a combinatorias binarias $\alpha_{ij},...$. La combinatoria principal radica en la elección de relaciones espaciales para cada par $(i,j)$; por tanto el espacio es exponencial en $n$ (combinatoria de orden $4^{(\frac n 2)}$ en el peor caso, aunque muchas combinaciones son inviables por límites geométricos).
+        \subsubsection{Comentarios metodológicos y referencia}
+        Este modelo es la formulación MIP clásica por coordenadas con variables binarias que evitan solapamiento; variantes de esta formulación y estrategias de fortalecimiento (cortes válidos, separación de simetrías) se encuentran en la literatura sobre 2D packing \cite{MartelloVigo1998Exact,Iori2020Survey}. Para instancias medianas la resolución exacta puede ser posible incorporando técnicas de ramificación y acotamiento.
+
+    \subsection{Modelo discreto}
+        \subsubsection{Parámetros}
+        \begin{itemize}
+            \item $n, W,w_ih_i$ 
+            \item $P={p_1,...,p_m}$
+            \item $Overlap(p,i,q,j)=1$ si colocar i en p y j en q provoca solapamiento, 0 en otro caso.
+        \end{itemize}
+    
+        La generación de P puede realizarse mediante heurísticas bottom-left, skyline, o enumerando esquinas válidas; el tamaño m controla el trade-off entre precisión y tractabilidad \cite{CidGarciaRios2020Review}.
+        \subsubsection{Variables}
+        \[z_{i,p}\in \{0,1\} \: \forall i\in \{1,...,n\}, p\in P.\]
+        \[H\geq0.\]
+        Donde $z_{i,p} =1 $ indica que el rectángulo i se coloca con su esquina inferior izquierda en la posición candidata p.
+        
+        \subsubsection{Objetivo}
+        Minimizar la altura total $H$ necesaria para empaquetar todos los rectángulos dentro del strip.
+    
+        {\centering $min \, H$ \par}
+    
+        \subsubsection{Restricciones}
+        \begin{enumerate}
+            \item \textbf{Cada rectángulo se asigna a exactamente una posición:}
+            \[
+            \sum_{p\in P} z_{i,p} = 1, \quad \forall i
+            \]
+            Cada rectángulo debe colocarse exactamente una vez en una posición factible.
+    
+            \item \textbf{Compatibilidad por solapamiento entre pares de asignaciones}
+            Para todo par $(i,p),(j,q)$ tales que colocar i en p y j en q produce solapamiento:
+            \[ z_{i,p}+z_{j,q} \leq 1\]
+            Ninguna celda del strip puede ser ocupada por más de un rectángulo.
+    
+            \item \textbf{Definición de la altura total:}
+            \[H \geq y_p + h_iz_{i,p} \]
+            La altura total $H$ debe ser al menos la coordenada superior del rectángulo más alto.
+    
+            \item \textbf{Rotación discreta:}
+            \[
+            w'_i = w_i(1-r_i) + h_i r_i, \qquad h'_i = h_i(1-r_i) + w_i r_i
+            \]
+            donde $w'_i, h'_i$ reemplazan a $w_i, h_i$ en las restricciones de ubicación.
+    
+            \item \textbf{Limitación de anchura del strip (si la posición candidata excede anchura, no es candidata):}
+    
+            Las posiciones p deben ser generadas de modo que $x_p+w_q\leq W$ para toda i con $z_{i,p}=1$. En la práctica, posiciones inviables no se incluyen en P.
+            \item \textbf{Dominio de las variables:}
+            \[
+            z_{i,p}, r_i \in \{0,1\}, \quad H \geq 0
+            \]
+        \end{enumerate}
+    
+        \subsubsection{Espacio de búsqueda}
+        El espacio es discreto: la asignación de n rectángulos a m posiciones candidatas con restricciones de compatibilidad. Su tamaño es aproximadamente $m^n$ en bruto, pero las restricciones de solapamiento reducen el número de combinaciones viables. Este enfoque convierte el problema geométrico continuo en un problema de cobertura/selección discreta tratable por solvers MIP o por métodos exactos especializados que explotan estructura de cobertura \cite{CidGarciaRios2020Review}.
+    
+        \subsubsection{Comentarios metodológicos y referencia}
+        Este modelo corresponde a la formulación discreta clásica del problema de corte y empaquetamiento en 2D, ampliamente utilizada en contextos donde el espacio se discretiza, como en corte de telas, tableros o placas \cite{ Iori2020Survey}.  
+        Aunque más intensiva en número de variables, facilita la aplicación de técnicas exactas en dominios finitos y puede integrarse con modelos CP o enfoques metaheurísticos discretos.
+
+    \subsection{Relación entre los modelos y elección práctica}
+        El coordenadas continuas es más fiel geométricamente (no depende de posiciones pre-generadas), pero su tamaño con binarias por par resulta rápidamente intratable al crecer n. Es adecuado cuando se desea una formulación general y se dispone de técnicas potentes de ramificación/acotación y fortalecimiento. Referencias: formulaciones clásicas y técnicas de acotación se discuten en \cite{MartelloVigo1998Exact,Iori2020Survey}.
+        El positions \& covering traslada la complejidad geométrica a un problema de selección/compatibilidad binaria; suele usarse en métodos exactos modernos que enumeran posiciones críticas y emplean cortes y column generation para resolver instancias medianas \cite{CidGarciaRios2020Review}. Es la base de muchas soluciones exactas recientes que amplían el tamaño de instancias tratables.
+
+\section{Conclusiones}
+
+El estudio del \textit{Two-Dimensional Strip Packing Problem} (2DSPP) permite observar que, si bien todas las técnicas analizadas buscan resolver el mismo objetivo general —minimizar la altura total del contenedor o maximizar la utilización del espacio—, existen diferencias significativas en los enfoques, la formulación matemática y las estrategias de resolución. Dichas variaciones surgen principalmente de la forma en que se representa el espacio de búsqueda, de los criterios de optimización empleados y del balance entre precisión y eficiencia computacional.
+
+Las metodologías exactas, como los modelos de programación entera mixta (MIP) o de enumeración de posiciones, ofrecen soluciones óptimas certificadas, pero su aplicabilidad práctica se limita a instancias pequeñas o medianas debido al crecimiento exponencial de las variables y restricciones involucradas. Estas técnicas comparten la ventaja de su rigor matemático, pero difieren en su capacidad para escalar y en la naturaleza continua o discreta de su formulación. En contraste, las heurísticas y metaheurísticas —tales como algoritmos genéticos, recocido simulado o búsqueda de vecindades variables— sacrifican la garantía de optimalidad en favor de la eficiencia, permitiendo obtener resultados de alta calidad en tiempos reducidos. En este sentido, todas las estrategias abordan el mismo problema estructural, pero difieren en la profundidad con que exploran el espacio de soluciones y en su adecuación a distintos contextos de aplicación.
+
+Una observación relevante es que las heurísticas constructivas y los modelos basados en perfiles (skyline o shelf) resultan particularmente útiles para instancias industriales donde la rapidez y simplicidad son prioritarias. Por el contrario, los modelos exactos basados en coordenadas o posiciones discretas son más apropiados cuando se requiere una validación teórica o una comparación con el óptimo. Esta dualidad evidencia que no existe una única técnica universalmente superior, sino que la elección del método depende de los requerimientos específicos del problema —ya sea precisión, escalabilidad o adaptabilidad.
+
+Entre las limitaciones detectadas, se destaca la sensibilidad de los métodos heurísticos a la distribución y tamaño de los rectángulos, lo cual puede conducir a resultados subóptimos en configuraciones irregulares. Asimismo, los modelos exactos sufren de ineficiencia computacional al crecer el número de piezas, lo que restringe su uso práctico en escenarios reales. Por otra parte, las metaheurísticas estocásticas presentan una dependencia notable respecto a la calibración de parámetros, lo que puede afectar la reproducibilidad de los resultados.
+
+Las tendencias actuales apuntan hacia la hibridación de enfoques, donde se combinan heurísticas rápidas con componentes exactos o mecanismos de aprendizaje automático para seleccionar estrategias de búsqueda adaptativas. Este paradigma híbrido —respaldado por estudios recientes— representa una línea de investigación prometedora, ya que busca integrar la precisión matemática de los modelos MIP con la flexibilidad y robustez de las metaheurísticas modernas.
+
+Como proyección futura, se propone profundizar en el uso de \textit{machine learning} aplicado a la parametrización dinámica de heurísticas y en la generación de portafolios algorítmicos inteligentes que aprendan a seleccionar automáticamente la técnica más adecuada según la estructura de la instancia. También resulta relevante explorar estrategias de paralelización y computación distribuida que permitan ampliar la escala de los problemas tratables, manteniendo un equilibrio entre exactitud y eficiencia.
+
+Finalmente, una posible contribución personal para continuar la investigación consiste en diseñar un modelo híbrido que combine la formulación discreta por posiciones con mecanismos de búsqueda adaptativa basados en aprendizaje por refuerzo. Este enfoque podría permitir ajustar las decisiones de colocación en tiempo real, aprendiendo de la estructura emergente del empaquetamiento y priorizando regiones del espacio con mayor potencial de compactación. En conjunto, estas líneas de trabajo apuntan a una evolución del 2DSPP hacia modelos más inteligentes, escalables y aplicables a contextos industriales reales.
+
+\bibliographystyle{plain}
+\bibliography{Referencias}
+
+\end{document} 
